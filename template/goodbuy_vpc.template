@@ -1,0 +1,894 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "vpcae8e95c8": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "1GoodBuyVPC"
+          }
+        ]
+      }
+    },
+    "subnet79ee0023": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "AvailabilityZone": "us-east-1b",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "private"
+          }
+        ]
+      }
+    },
+    "subnetc8ed0392": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1b",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "public"
+          }
+        ]
+      }
+    },
+    "subnet0fef0155": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "AvailabilityZone": "us-east-1b",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "management"
+          }
+        ]
+      }
+    },
+    "igw9a29f9fc": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+      }
+    },
+    "doptcaf71fac": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "ec2.internal",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "acl0c2e9275": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "0Management Subnet ACL"
+          }
+        ]
+      }
+    },
+    "aclb62e92cf": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "0Public Subnet ACL"
+          }
+        ]
+      }
+    },
+    "acl922f93eb": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "0Private Subnet ACL"
+          }
+        ]
+      }
+    },
+    "rtb5b041222": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "rtb5b0e1822": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "rtbc70016be": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "eip341981743": {
+      "Type": "AWS::EC2::EIP",
+      "DependsOn": [
+        "gw1"
+      ],
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "instancei0b03c81e8a228d637": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": "ami-c02b04a8",
+        "InstanceType": "m1.small",
+        "KernelId": "aki-919dcaf8",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "1NAT instance"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "subnetc8ed0392"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "10.0.0.174",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgGoodBuyVPCStackAgainsgdefault1HR3Z9CSNRK22"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "topicgoodbuyalerts": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "goodbuy-alerts",
+        "Subscription": [
+          {
+            "Endpoint": "patel.che@gmail.com",
+            "Protocol": "email"
+          }
+        ]
+      }
+    },
+    "sgGoodBuyVPCStackAgainsgdefault1HR3Z9CSNRK22": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "default VPC security group",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "sgGoodBuyVPCStackAgainsglaunchwizard210FU8NSK9O9K4": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "launch-wizard-2 created 2017-04-29T14:47:03.523+08:00",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "sgGoodBuyVPCStackAgainsgOpenVPNAccessServer214AutogenByAWSMP1MXW22393Z34Z": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "This security group was generated by AWS Marketplace and is based on recommended settings for OpenVPN Access Server version 2.1.4 provided by OpenVPN Technologies, Inc.",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "sgGoodBuyVPCStackAgainsgTomcatonUbuntupoweredbyIAANSYSHVM102AutogenByAWSMP9M8U80MXBP0E": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "This security group was generated by AWS Marketplace and is based on recommended settings for Tomcat on Ubuntu powered by IAANSYS (HVM) version 1.0.2 provided by IAANSYS, Inc",
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        }
+      }
+    },
+    "snspolicygoodbuyalerts": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Properties": {
+        "Topics": [
+          {
+            "Ref": "topicgoodbuyalerts"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Id": "__default_policy_ID",
+          "Statement": [
+            {
+              "Sid": "__default_statement_ID",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "*"
+              },
+              "Action": [
+                "SNS:GetTopicAttributes",
+                "SNS:SetTopicAttributes",
+                "SNS:AddPermission",
+                "SNS:RemovePermission",
+                "SNS:DeleteTopic",
+                "SNS:Subscribe",
+                "SNS:ListSubscriptionsByTopic",
+                "SNS:Publish",
+                "SNS:Receive"
+              ],
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              },
+              "Condition": {
+                "StringEquals": {
+                  "AWS:SourceOwner": "970407962922"
+                }
+              }
+            },
+            {
+              "Sid": "AWSCloudTrailSNSPolicy20150319",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "SNS:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            },
+            {
+              "Sid": "AWSEvents_IAM_Id21071221228340",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            },
+            {
+              "Sid": "AWSEvents_StorageGateway_Id34724079163315",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            },
+            {
+              "Sid": "AWSEvents_EC2_StatusChange_Id42321618759536",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            },
+            {
+              "Sid": "AWSEvents_S3_Read_Writes_Id6722191074421",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            },
+            {
+              "Sid": "AWSEvents_KMS_Id360044960146",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            },
+            {
+              "Sid": "AWSEvents_DataPipeline_Id11433986770144",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "topicgoodbuyalerts"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "s3policygoodbuyappbucket": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": "goodbuy-app-bucket",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Id": "Policy1493836529674",
+          "Statement": [
+            {
+              "Sid": "Stmt1493836527776",
+              "Effect": "Deny",
+              "Principal": {
+                "AWS": "*"
+              },
+              "Action": "s3:*",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    "goodbuy-app-bucket",
+                    "/*"
+                  ]
+                ]
+              },
+              "Condition": {
+                "StringNotEquals": {
+                  "s3:x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:970407962922:key/55e5bc73-b64d-4d86-83a4-ee6b95a809de"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "s3policygoodbuycloudtrailbucket": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": "goodbuy-cloudtrail-bucket",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "AWSCloudTrailAclCheck20150319",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "s3:GetBucketAcl",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    "goodbuy-cloudtrail-bucket",
+                    ""
+                  ]
+                ]
+              }
+            },
+            {
+              "Sid": "AWSCloudTrailWrite20150319",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "s3:PutObject",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    "goodbuy-cloudtrail-bucket",
+                    "/AWSLogs/970407962922/*"
+                  ]
+                ]
+              },
+              "Condition": {
+                "StringEquals": {
+                  "s3:x-amz-acl": "bucket-owner-full-control"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "trailGoodBuyCloudTrail": {
+      "Type": "AWS::CloudTrail::Trail",
+      "Properties": {
+        "IncludeGlobalServiceEvents": true,
+        "IsLogging": "true",
+        "S3BucketName": "goodbuy-cloudtrail-bucket"
+      }
+    },
+    "acl1": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "PortRange": {
+          "From": "0",
+          "To": "65535"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0c2e9275"
+        }
+      }
+    },
+    "acl2": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "200",
+        "PortRange": {
+          "From": "22",
+          "To": "22"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0c2e9275"
+        }
+      }
+    },
+    "acl3": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "PortRange": {
+          "From": "22",
+          "To": "22"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0c2e9275"
+        }
+      }
+    },
+    "acl4": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "200",
+        "PortRange": {
+          "From": "0",
+          "To": "65535"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0c2e9275"
+        }
+      }
+    },
+    "acl5": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "300",
+        "PortRange": {
+          "From": "0",
+          "To": "65535"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0c2e9275"
+        }
+      }
+    },
+    "acl6": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclb62e92cf"
+        }
+      }
+    },
+    "acl7": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclb62e92cf"
+        }
+      }
+    },
+    "acl8": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "500",
+        "PortRange": {
+          "From": "0",
+          "To": "65535"
+        },
+        "NetworkAclId": {
+          "Ref": "acl922f93eb"
+        }
+      }
+    },
+    "acl9": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "PortRange": {
+          "From": "22",
+          "To": "22"
+        },
+        "NetworkAclId": {
+          "Ref": "acl922f93eb"
+        }
+      }
+    },
+    "acl10": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "200",
+        "PortRange": {
+          "From": "80",
+          "To": "80"
+        },
+        "NetworkAclId": {
+          "Ref": "acl922f93eb"
+        }
+      }
+    },
+    "acl11": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "300",
+        "PortRange": {
+          "From": "8443",
+          "To": "8443"
+        },
+        "NetworkAclId": {
+          "Ref": "acl922f93eb"
+        }
+      }
+    },
+    "subnetacl1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl0c2e9275"
+        },
+        "SubnetId": {
+          "Ref": "subnet0fef0155"
+        }
+      }
+    },
+    "subnetacl2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclb62e92cf"
+        },
+        "SubnetId": {
+          "Ref": "subnetc8ed0392"
+        }
+      }
+    },
+    "subnetacl3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl922f93eb"
+        },
+        "SubnetId": {
+          "Ref": "subnet79ee0023"
+        }
+      }
+    },
+    "gw1": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "InternetGatewayId": {
+          "Ref": "igw9a29f9fc"
+        }
+      }
+    },
+    "subnetroute1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb5b041222"
+        },
+        "SubnetId": {
+          "Ref": "subnetc8ed0392"
+        }
+      }
+    },
+    "subnetroute2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb5b041222"
+        },
+        "SubnetId": {
+          "Ref": "subnet79ee0023"
+        }
+      }
+    },
+    "route1": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb5b041222"
+        },
+        "GatewayId": {
+          "Ref": "igw9a29f9fc"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "route2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtbc70016be"
+        },
+        "InstanceId": {
+          "Ref": "instancei0b03c81e8a228d637"
+        }
+      }
+    },
+    "dchpassoc1": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcae8e95c8"
+        },
+        "DhcpOptionsId": {
+          "Ref": "doptcaf71fac"
+        }
+      }
+    },
+    "assoc1": {
+      "Type": "AWS::EC2::EIPAssociation",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "eip341981743",
+            "AllocationId"
+          ]
+        },
+        "InstanceId": {
+          "Ref": "instancei0b03c81e8a228d637"
+        }
+      }
+    },
+    "ingress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgdefault1HR3Z9CSNRK22"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgdefault1HR3Z9CSNRK22"
+        },
+        "SourceSecurityGroupOwnerId": "970407962922"
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsglaunchwizard210FU8NSK9O9K4"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "10.0.0.0/24"
+      }
+    },
+    "ingress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgOpenVPNAccessServer214AutogenByAWSMP1MXW22393Z34Z"
+        },
+        "IpProtocol": "udp",
+        "FromPort": "1194",
+        "ToPort": "1194",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgOpenVPNAccessServer214AutogenByAWSMP1MXW22393Z34Z"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "10.0.2.0/24"
+      }
+    },
+    "ingress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgOpenVPNAccessServer214AutogenByAWSMP1MXW22393Z34Z"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "943",
+        "ToPort": "943",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgOpenVPNAccessServer214AutogenByAWSMP1MXW22393Z34Z"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress7": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgTomcatonUbuntupoweredbyIAANSYSHVM102AutogenByAWSMP9M8U80MXBP0E"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "10.0.0.0/24"
+      }
+    },
+    "ingress8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgTomcatonUbuntupoweredbyIAANSYSHVM102AutogenByAWSMP9M8U80MXBP0E"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "10.0.2.0/24"
+      }
+    },
+    "ingress9": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgTomcatonUbuntupoweredbyIAANSYSHVM102AutogenByAWSMP9M8U80MXBP0E"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8443",
+        "ToPort": "8443",
+        "CidrIp": "10.0.0.0/24"
+      }
+    },
+    "egress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgdefault1HR3Z9CSNRK22"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress2": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsglaunchwizard210FU8NSK9O9K4"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgOpenVPNAccessServer214AutogenByAWSMP1MXW22393Z34Z"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress4": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgGoodBuyVPCStackAgainsgTomcatonUbuntupoweredbyIAANSYSHVM102AutogenByAWSMP9M8U80MXBP0E"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": "GoodBuy VPC template"
+}
